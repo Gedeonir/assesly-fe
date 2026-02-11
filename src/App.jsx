@@ -8,6 +8,7 @@ import TeacherAssessments from "./pages/Teacher/TAssesments";
 import CreateAssessment from "./pages/Teacher/CreateAssesment";
 import AssessmentView from "./pages/Teacher/AssesmentView";
 import Profile from "./pages/Teacher/TProfile";
+import Classes from "./pages/Teacher/TClasses";
 
 function App() {
   return (
@@ -52,10 +53,19 @@ function App() {
       />
 
       <Route
-        path="/teacher/profile"
+        path="/teacher/dashboard/profile"
         element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/teacher/dashboard/classes"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <Classes />
           </ProtectedRoute>
         }
       />

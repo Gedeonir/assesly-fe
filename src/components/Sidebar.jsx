@@ -1,18 +1,26 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../context/UseAuth";
 
 export default function Sidebar({ role }) {
   const teacherLinks = [
     { name: "Dashboard", href: "/teacher/dashboard/" },
-    { name: "Classes", href: "#" },
+    { name: "Classes", href: "/teacher/dashboard/classes" },
     { name: "Students", href: "#" },
     { name: "Assessments", href: "/teacher/dashboard/assessments" },
-    { name: "Profile", href: "/teacher/profile" },
+    { name: "Profile", href: "/teacher/dashboard/profile" },
     { name: "Logout", href: "#" },
   ];
 
   const links = role === "teacher" ? teacherLinks : [];
   const location = useLocation();
+  const { logout } = useAuth();
+
+  const handleLogout = (role) => {
+    logout(role);
+    // redirect by role
+    navigate("/");
+  };
 
   return (
     <aside className="w-64 bg-card dark:bg-darkCard py-6 hidden md:flex flex-col space-y-4">
