@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
-import StudentDashboard from "./pages/StudentDashboard";
+import StudentDashboard from "./pages/students/StudentDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import TeacherAssessments from "./pages/Teacher/TAssesments";
@@ -9,6 +9,7 @@ import CreateAssessment from "./pages/Teacher/CreateAssesment";
 import AssessmentView from "./pages/Teacher/AssesmentView";
 import Profile from "./pages/Teacher/TProfile";
 import Classes from "./pages/Teacher/TClasses";
+import StudentLayout from "./pages/students/StudentLayout";
 
 function App() {
   return (
@@ -74,10 +75,12 @@ function App() {
         path="/student/*"
         element={
           <ProtectedRoute allowedRoles={["student"]}>
-            <StudentDashboard />
+            <StudentLayout />
           </ProtectedRoute>
         }
-      />
+      >
+         <Route index element={<StudentDashboard />} />
+      </Route>
 
       <Route path="*" element={<NotFound />} />
     </Routes>
