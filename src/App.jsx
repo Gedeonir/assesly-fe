@@ -5,6 +5,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import TeacherAssessments from "./pages/Teacher/TAssesments";
+import CreateAssessment from "./pages/Teacher/CreateAssesment";
 
 function App() {
   return (
@@ -25,6 +26,11 @@ function App() {
       <Route path="/teacher/dashboard/assessments" element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <TeacherAssessments />
+          </ProtectedRoute>
+        } />
+         <Route path="/teacher/dashboard/assessments/new" element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <CreateAssessment />
           </ProtectedRoute>
         } />
 
