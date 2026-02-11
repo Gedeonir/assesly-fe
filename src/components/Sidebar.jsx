@@ -7,7 +7,7 @@ export default function Sidebar({ role }) {
     { name: "Classes", href: "#" },
     { name: "Students", href: "#" },
     { name: "Assessments", href: "/teacher/dashboard/assessments" },
-    { name: "Profile", href: "#" },
+    { name: "Profile", href: "/teacher/profile" },
     { name: "Logout", href: "#" },
   ];
 

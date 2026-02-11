@@ -94,7 +94,9 @@ const navigate=useNavigate();
                     className="border-b border-border dark:border-darkBorder hover:bg-gray-50 dark:hover:bg-darkCard transition"
                   >
                     <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
-                      {a.name}
+                      <a href={`/teacher/dashboard/assessments/view?id=${a.id}`}>
+                        {a.name}
+                      </a>
                     </td>
                     <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
                       {a.class}

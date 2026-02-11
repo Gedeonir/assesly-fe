@@ -6,6 +6,8 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import TeacherAssessments from "./pages/Teacher/TAssesments";
 import CreateAssessment from "./pages/Teacher/CreateAssesment";
+import AssessmentView from "./pages/Teacher/AssesmentView";
+import Profile from "./pages/Teacher/TProfile";
 
 function App() {
   return (
@@ -22,18 +24,41 @@ function App() {
       >
         {/* <Route path="classes" element={<TeacherClasses />} /> */}
       </Route>
-      
-      <Route path="/teacher/dashboard/assessments" element={
+
+      <Route
+        path="/teacher/dashboard/assessments"
+        element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <TeacherAssessments />
           </ProtectedRoute>
-        } />
-         <Route path="/teacher/dashboard/assessments/new" element={
+        }
+      />
+      <Route
+        path="/teacher/dashboard/assessments/new"
+        element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <CreateAssessment />
           </ProtectedRoute>
-        } />
+        }
+      />
 
+      <Route
+        path="/teacher/dashboard/assessments/view"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <AssessmentView />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/teacher/profile"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/student/*"
