@@ -55,7 +55,7 @@ export default function StudentLayout() {
           </NavLink>
 
           <NavLink
-            to="/student/results"
+            to="/student/results/history"
             className={({ isActive }) =>
               `${navLinkStyle} ${
                 isActive
@@ -64,7 +64,7 @@ export default function StudentLayout() {
               }`
             }
           >
-            Results
+            Results History
           </NavLink>
 
           <NavLink

@@ -10,6 +10,12 @@ import AssessmentView from "./pages/Teacher/AssesmentView";
 import Profile from "./pages/Teacher/TProfile";
 import Classes from "./pages/Teacher/TClasses";
 import StudentLayout from "./pages/students/StudentLayout";
+import TakeAssessment from "./pages/students/TakeAssessment";
+import StudentResults from "./pages/students/StudentsResults";
+import StudentResultsHistory from "./pages/students/StudentResultHistory";
+import StudentProfile from "./pages/students/StudentProfile";
+import StudentAssessments from "./pages/students/StudentAssesments";
+import StudentClasses from "./pages/students/StudentClasses";
 
 function App() {
   return (
@@ -80,6 +86,12 @@ function App() {
         }
       >
          <Route index element={<StudentDashboard />} />
+         <Route path="classes" element={<StudentClasses />} />
+         <Route path="assessments/:id/take" element={<TakeAssessment />} />
+         <Route path="assessments" element={<StudentAssessments />} />
+         <Route path="results/:id" element={<StudentResults/>} />
+         <Route path="results/history" element={<StudentResultsHistory/>} />
+         <Route path="profile" element={<StudentProfile/>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
