@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }) {
         className={`
           fixed md:relative inset-y-0 left-0 z-40
           transition-all duration-300 ease-in-out
-          ${!collapsed ? "w-0" : "w-64"}
+          ${!collapsed ? "w-0" : "w-48"}
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
           bg-card dark:bg-darkCard
@@ -24,6 +24,7 @@ export default function DashboardLayout({ children }) {
         <Sidebar
           role="teacher"
           collapsed={collapsed}
+          sidebarOpen={sidebarOpen}
           toggleCollapse={() => setCollapsed(!collapsed)}
         />
       </div>
@@ -41,7 +42,7 @@ export default function DashboardLayout({ children }) {
 
         {/* Navbar */}
         <div className="sticky top-0 z-20">
-          <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <Navbar toggleCollapse={() => setCollapsed(!collapsed)} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} collapsed={collapsed}/>
         </div>
 
         {/* Page Content */}
