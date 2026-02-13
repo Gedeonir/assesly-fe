@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function StudentProfile() {
   const [editMode, setEditMode] = useState(false);
-
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
   const [profile, setProfile] = useState({
     firstName: "John",
     lastName: "Doe",
@@ -27,37 +29,46 @@ export default function StudentProfile() {
   const handleLogout = () => {
     // Clear any auth/session info here
     console.log("User logged out");
-    navigate("/login"); // redirect to login page
+    navigate("/"); // redirect to login page
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="bg-card dark:bg-darkCard p-6 rounded-xl shadow flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div
+        className="bg-card dark:bg-darkCard p-6 rounded-xl shadow 
+                flex flex-col md:flex-row md:items-center md:justify-between 
+                gap-6"
+      >
+        {/* Left */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
           <div className="w-20 h-20 bg-primary text-white flex items-center justify-center rounded-full text-2xl font-bold">
             {profile.firstName.charAt(0)}
             {profile.lastName.charAt(0)}
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl sm:text-2xl font-bold">
               {profile.firstName} {profile.lastName}
             </h1>
-            <p className="text-textSecondary">{profile.email}</p>
+            <p className="text-sm sm:text-base text-textSecondary">
+              {profile.email}
+            </p>
           </div>
         </div>
 
-        <div className="flex gap-4">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <button
             onClick={() => setEditMode(!editMode)}
-            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primaryHover transition"
+            className="w-full sm:w-auto bg-primary text-white px-4 py-2 rounded-lg hover:bg-primaryHover transition"
           >
             {editMode ? "Cancel" : "Edit Profile"}
           </button>
+
           <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
           >
             Logout
           </button>
@@ -68,7 +79,7 @@ export default function StudentProfile() {
       <div className="bg-card dark:bg-darkCard p-6 rounded-xl shadow space-y-4">
         <h2 className="text-lg font-semibold">Academic Information</h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <label className="text-sm text-textSecondary">First Name</label>
             <input
@@ -144,7 +155,7 @@ export default function StudentProfile() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-card dark:bg-darkCard p-4 rounded-xl shadow text-center">
           <p className="text-2xl font-bold text-primary">12</p>
           <p className="text-sm text-textSecondary">Assessments Taken</p>
@@ -165,16 +176,16 @@ export default function StudentProfile() {
       <div className="bg-card dark:bg-darkCard p-6 rounded-xl shadow space-y-4">
         <h2 className="text-lg font-semibold">Change Password</h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <input
             type="password"
             placeholder="Current Password"
-            className="p-2 border rounded-lg"
+            className="w-full p-2 border rounded-lg"
           />
           <input
             type="password"
             placeholder="New Password"
-            className="p-2 border rounded-lg"
+            className="w-full p-2 border rounded-lg"
           />
         </div>
 
@@ -182,6 +193,37 @@ export default function StudentProfile() {
           Update Password
         </button>
       </div>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div
+            className="bg-white dark:bg-darkCard 
+                p-6 rounded-xl shadow-xl 
+                w-[90%] sm:w-96 space-y-4"
+          >
+            <h2 className="text-lg font-semibold">Confirm Logout</h2>
+            <p className="text-textSecondary dark:text-darkTextSecondary">
+              Are you sure you want to logout?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 rounded-lg border"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

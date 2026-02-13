@@ -65,7 +65,7 @@ function Login() {
 
           {/* Login button */}
           <button
-            onClick={() => handleLogin("student")}
+            onClick={() => handleLogin("teacher")}
             className="w-full mt-4 py-3 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition"
           >
             Login

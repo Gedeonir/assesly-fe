@@ -17,9 +17,9 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
-      <h1 className="text-2xl font-bold text-textPrimary dark:text-darkTextPrimary">
+      <h1 className="text-xl sm:text-2xl font-bold text-textPrimary dark:text-darkTextPrimary">
         Student Dashboard
       </h1>
 
@@ -38,7 +38,7 @@ export default function StudentDashboard() {
 
       {/* Upcoming Assessments */}
       <div className="bg-card dark:bg-darkCard p-6 rounded-2xl shadow">
-        <h2 className="text-lg font-semibold mb-4">Upcoming Assessments</h2>
+        <h2 className="text-lg font-semibold mb-6">Upcoming Assessments</h2>
 
         {upcomingAssessments.length === 0 ? (
           <p className="text-textSecondary">No upcoming assessments.</p>
@@ -47,10 +47,13 @@ export default function StudentDashboard() {
             {upcomingAssessments.map((assessment) => (
               <div
                 key={assessment.id}
-                className="p-4 grid grid-cols-3 gap-4 rounded-xl border border-border dark:border-darkBorder hover:bg-background dark:hover:bg-darkBackground transition"
+                className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-xl border border-border dark:border-darkBorder hover:bg-background dark:hover:bg-darkBackground transition"
               >
-                <div className="col-span-2">
-                  <h3 className="font-semibold">{assessment.title}</h3>
+                {/* Left Content */}
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-base sm:text-lg">
+                    {assessment.title}
+                  </h3>
                   <p className="text-sm text-textSecondary">
                     Subject: {assessment.subject}
                   </p>
@@ -58,19 +61,15 @@ export default function StudentDashboard() {
                     Due: {assessment.due}
                   </p>
                 </div>
-                <div className="flex items-center justify-end">
-                <NavLink
-                  to={`/student/assessments/${assessment.id}/take`}
-                  className={({ isActive }) =>
-                    `${navLinkStyle} ${
-                      isActive
-                        ? "bg-primary text-white"
-                        : "px-4 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primaryHover transition"
-                    }`
-                  }
-                >
-                  Take Assessment
-                </NavLink>
+
+                {/* Button */}
+                <div className="w-full md:w-auto">
+                  <NavLink
+                    to={`/student/assessments/${assessment.id}/take`}
+                    className="block text-center px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primaryHover transition"
+                  >
+                    Take Assessment
+                  </NavLink>
                 </div>
               </div>
             ))}
