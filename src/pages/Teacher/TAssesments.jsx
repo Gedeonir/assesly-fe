@@ -47,98 +47,118 @@ const navigate=useNavigate();
     setAssessments(assessments.filter((a) => a.id !== id));
   };
 
-  return (
-    <DashboardLayout>
-  
-        <div className="bg-card dark:bg-darkCard p-6 rounded-2xl shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-textPrimary dark:text-darkTextPrimary">
-              Assessments
-            </h3>
-            <button
-              onClick={handleCreateAssessment}
-              className="py-2 px-4 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition"
-            >
-              + Create Assessment
-            </button>
-          </div>
+return (
+  <DashboardLayout>
+    <div className="bg-card dark:bg-darkCard p-4 sm:p-6 rounded-2xl shadow-lg">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+        <h3 className="text-xl font-bold text-textPrimary dark:text-darkTextPrimary">
+          Assessments
+        </h3>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-border dark:border-darkBorder">
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Name
-                  </th>
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Class
-                  </th>
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Due Date
-                  </th>
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Status
-                  </th>
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Avg Score
-                  </th>
-                  <th className="p-3 text-textSecondary dark:text-darkTextSecondary">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessments.map((a) => (
-                  <tr
-                    key={a.id}
-                    className="border-b border-border dark:border-darkBorder hover:bg-gray-50 dark:hover:bg-darkCard transition"
+        <button
+          onClick={handleCreateAssessment}
+          className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition"
+        >
+          + Create Assessment
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          
+          {/* Desktop Header */}
+          <thead className="hidden md:table-header-group">
+            <tr className="border-b border-border dark:border-darkBorder">
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Name</th>
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Class</th>
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Due Date</th>
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Status</th>
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Avg Score</th>
+              <th className="p-3 text-textSecondary dark:text-darkTextSecondary">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {assessments.map((a) => (
+              <tr
+                key={a.id}
+                className="border-b border-border dark:border-darkBorder 
+                           block md:table-row 
+                           mb-4 md:mb-0 
+                           bg-gray-50 md:bg-transparent 
+                           dark:bg-darkCard md:dark:bg-transparent 
+                           rounded-xl md:rounded-none 
+                           p-4 md:p-0"
+              >
+                {/* Name */}
+                <td className="p-2 md:p-3 text-textPrimary dark:text-darkTextPrimary block md:table-cell">
+                  <span className="md:hidden font-semibold">Name: </span>
+                  <a href={`/teacher/dashboard/assessments/view?id=${a.id}`}>
+                    {a.name}
+                  </a>
+                </td>
+
+                {/* Class */}
+                <td className="p-2 md:p-3 text-textPrimary dark:text-darkTextPrimary block md:table-cell">
+                  <span className="md:hidden font-semibold">Class: </span>
+                  {a.class}
+                </td>
+
+                {/* Due Date */}
+                <td className="p-2 md:p-3 text-textPrimary dark:text-darkTextPrimary block md:table-cell">
+                  <span className="md:hidden font-semibold">Due Date: </span>
+                  {a.dueDate}
+                </td>
+
+                {/* Status */}
+                <td
+                  className={`p-2 md:p-3 font-bold block md:table-cell ${
+                    a.status === "Completed"
+                      ? "text-success"
+                      : a.status === "Pending"
+                      ? "text-warning"
+                      : "text-error"
+                  }`}
+                >
+                  <span className="md:hidden font-semibold text-textPrimary dark:text-darkTextPrimary">
+                    Status:{" "}
+                  </span>
+                  {a.status}
+                </td>
+
+                {/* Avg Score */}
+                <td className="p-2 md:p-3 text-textPrimary dark:text-darkTextPrimary block md:table-cell">
+                  <span className="md:hidden font-semibold">Avg Score: </span>
+                  {a.avgScore > 0 ? `${a.avgScore}%` : "-"}
+                </td>
+
+                {/* Actions */}
+                <td className="p-2 md:p-3 flex flex-row sm:flex-row gap-4 md:table-cell">
+                  <button
+                    onClick={() => handleEdit(a.id)}
+                    className="w-full sm:w-auto px-3 py-1 mr-2 bg-primaryHover dark:bg-darkPrimaryHover text-white rounded-md text-sm"
                   >
-                    <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
-                      <a href={`/teacher/dashboard/assessments/view?id=${a.id}`}>
-                        {a.name}
-                      </a>
-                    </td>
-                    <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
-                      {a.class}
-                    </td>
-                    <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
-                      {a.dueDate}
-                    </td>
-                    <td
-                      className={`p-3 font-bold ${
-                        a.status === "Completed"
-                          ? "text-success"
-                          : a.status === "Pending"
-                            ? "text-warning"
-                            : "text-error"
-                      }`}
-                    >
-                      {a.status}
-                    </td>
-                    <td className="p-3 text-textPrimary dark:text-darkTextPrimary">
-                      {a.avgScore > 0 ? `${a.avgScore}%` : "-"}
-                    </td>
-                    <td className="p-3 flex gap-2">
-                      <button
-                        onClick={() => handleEdit(a.id)}
-                        className="px-2 py-1 bg-primaryHover dark:bg-darkPrimaryHover text-white rounded-md text-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(a.id)}
-                        className="px-2 py-1 bg-error text-white rounded-md text-sm"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    Edit
+                  </button>
 
-    </DashboardLayout>
-  );
+                  <button
+                    onClick={() => handleDelete(a.id)}
+                    className="w-full sm:w-auto px-3 py-1 bg-error text-white rounded-md text-sm"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </DashboardLayout>
+);
+
 }
