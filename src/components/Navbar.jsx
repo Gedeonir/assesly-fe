@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-
+import logo from "../assets/AsseslyLogo.png";
 
 export default function Navbar({ toggleCollapse, collapsed }) {
   const [openModal, setOpenModal] = useState(false);
@@ -15,7 +15,7 @@ export default function Navbar({ toggleCollapse, collapsed }) {
           {!collapsed && <Menu size={20} />}
         </button>
         <img
-          src="/src/assets/AsseslyLogo.png"
+          src={logo}
           alt="Assessly Logo"
           className="w-32 h-16"
         />

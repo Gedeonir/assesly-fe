@@ -2,6 +2,7 @@ import { useAuth } from "../context/UseAuth";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../utils/ThemeToggle";
 import { useState } from "react";
+import logo from "../assets/AsseslyLogo.png";
 
 function Login() {
   const { login } = useAuth();
@@ -73,7 +74,7 @@ function Login() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md bg-card dark:bg-darkCard p-8 rounded-2xl shadow-lg">
           <img
-            src="./src/assets/AsseslyLogo.png"
+            src={logo}
             alt="Assessly Logo"
             className="w-32 h-12 mx-auto mb-6"
           />
@@ -164,7 +165,7 @@ function Login() {
       {/* Right side: Illustration */}
       <div className="flex-1 hidden md:flex items-center justify-center p-8">
         <img
-          src="./src/assets/AsseslyLogo.png"
+          src={logo}
           alt="Assessly Illustration"
           className="max-w-lg animate-fadeIn"
         />
