@@ -61,7 +61,6 @@ function Login() {
     else navigate("/student");
   };
 
-  console.log(errors);
 
   const handleGoogleLogin = () => {
     // Replace with Google OAuth login
@@ -85,7 +84,7 @@ function Login() {
             Log in to continue managing daily assessments
           </p>
           {errors.general && (
-            <p className="text-center mb-6" style={{ color: "red", fontSize: "0.875rem" }}>
+            <p className="mb-6" style={{ color: "red", fontSize: "0.875rem" }}>
               {errors.general}
             </p>
           )}

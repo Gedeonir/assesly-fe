@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AuthContext } from "./AuthContext";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(
@@ -32,7 +32,57 @@ export function AuthProvider({ children }) {
 
       return profileRes.data; // Return user data for further use (e.g., redirecting based on role)
     } catch (error) {
-      return { error: error.response};
+      return { error: error.response };
+    }
+  };
+
+  const getClasses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/classes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
+  };
+
+  const createClass = async (className) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `${API_URL}/classes`,
+        {
+          name:className,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
+  };
+
+  const deleteClass = async (classId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.delete(`${API_URL}/classes/${classId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      
+      return { error: error.response };
     }
   };
 
@@ -42,7 +92,9 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, getClasses, createClass, deleteClass }}
+    >
       {children}
     </AuthContext.Provider>
   );
