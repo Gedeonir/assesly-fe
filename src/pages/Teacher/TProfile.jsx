@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import DashboardLayout from "./DashboardLayout";
 import LogoutModal from "../../components/LogoutModal";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -10,6 +11,8 @@ export default function Profile() {
     newPass: "",
     confirm: "",
   });
+
+  const navigate = useNavigate();
 
   const handlePasswordChange = (key, value) => {
     setPasswords({ ...passwords, [key]: value });

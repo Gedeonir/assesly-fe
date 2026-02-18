@@ -14,7 +14,7 @@ export default function Navbar({ toggleCollapse, collapsed }) {
           {!collapsed && <Menu size={20} />}
         </button>
         <img
-          src="/src/assets/AsseslyLogo.png"
+          src="./src/assets/AsseslyLogo.png"
           alt="Assessly Logo"
           className="w-32 h-16"
         />

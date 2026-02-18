@@ -6,15 +6,62 @@ import { useState } from "react";
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (role) => {
-    login(role);
+  const validate = (name, value) => {
+    let validated=true;
+    let error = "";
+
+    if (!value.trim()) {
+      error = "This field is required";
+      validated=false;
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+
+    return validated;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm({
+      ...form,
+      [name]: value,
+    });
+
+    validate(name, value); // 🔥 live validation
+  };
+
+  const handleLogin = async () => {
+    setErrors({}); // Clear previous errors
+    if (!validate("email", form.email) || !validate("password", form.password)) {
+      return;
+    }
+    setLoading(true);
+    const loginResponse = await login(form.email, form.password);
+
+    if (loginResponse.error) {
+      setErrors({
+        general: loginResponse.error.data.message || "Login failed",
+      });
+      setLoading(false);
+      return;
+    }
     // redirect by role
-    if (role === "teacher") navigate("/teacher/dashboard");
+    if (loginResponse.role === "teacher") navigate("/teacher/dashboard");
     else navigate("/student");
   };
+
+  console.log(errors);
 
   const handleGoogleLogin = () => {
     // Replace with Google OAuth login
@@ -27,7 +74,7 @@ function Login() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md bg-card dark:bg-darkCard p-8 rounded-2xl shadow-lg">
           <img
-            src="/src/assets/AsseslyLogo.png"
+            src="./src/assets/AsseslyLogo.png"
             alt="Assessly Logo"
             className="w-32 h-12 mx-auto mb-6"
           />
@@ -37,23 +84,40 @@ function Login() {
           <p className="text-textSecondary dark:text-darkTextSecondary text-center mb-6">
             Log in to continue managing daily assessments
           </p>
+          {errors.general && (
+            <p className="text-center mb-6" style={{ color: "red", fontSize: "0.875rem" }}>
+              {errors.general}
+            </p>
+          )}
 
           {/* Form inputs */}
           <div className="space-y-4">
             <input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={form.email}
+              onBlur={handleChange}
+              onChange={handleChange}
               className="w-full p-3 rounded-lg border border-border dark:border-darkBorder bg-background dark:bg-darkCard text-textPrimary dark:text-darkTextPrimary focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-darkPrimary"
             />
+            {errors.email && (
+              <p style={{ color: "red", fontSize: "0.875rem" }}>
+                {errors.email}
+              </p>
+            )}
             <input
               type="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={form.password}
+              onBlur={handleChange}
+              onChange={handleChange}
               className="w-full p-3 rounded-lg border border-border dark:border-darkBorder bg-background dark:bg-darkCard text-textPrimary dark:text-darkTextPrimary focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-darkPrimary"
             />
+            {errors.password && (
+              <p style={{ color: "red" }}>{errors.password}</p>
+            )}
           </div>
 
           {/* Forgot password */}
@@ -65,8 +129,11 @@ function Login() {
 
           {/* Login button */}
           <button
-            onClick={() => handleLogin("teacher")}
-            className="w-full mt-4 py-3 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition"
+            onClick={() => handleLogin()}
+            className={`
+              ${loading || errors.email || errors.password ? "opacity-50 cursor-not-allowed" : "hover:bg-primaryHover dark:hover:bg-darkPrimaryHover"}
+              w-full mt-4 py-3 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition`}
+          disabled={errors.email || errors.password || loading}
           >
             Login
           </button>
@@ -98,7 +165,7 @@ function Login() {
       {/* Right side: Illustration */}
       <div className="flex-1 hidden md:flex items-center justify-center p-8">
         <img
-          src="/src/assets/AsseslyLogo.png"
+          src="./src/assets/AsseslyLogo.png"
           alt="Assessly Illustration"
           className="max-w-lg animate-fadeIn"
         />
