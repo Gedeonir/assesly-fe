@@ -43,7 +43,6 @@ export default function Classes() {
   const handleDeleteClass = async (classId, className) => {
     setDeleteStatus({ loading: true, error: null, success: null });
     const result = await deleteClass(classId);
-    console.log(result);
     if (result && !result.error) {
       setDeleteStatus({
         loading: false,

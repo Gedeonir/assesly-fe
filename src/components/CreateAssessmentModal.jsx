@@ -1,25 +1,39 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/UseAuth";
+import { Trash2 } from "lucide-react";
 
 export default function CreateAssessmentModal({ onSave }) {
-  const [title, setTitle] = useState("");
-  const [className, setClassName] = useState("");
-  const [startDateTime, setStartDateTime] = useState("");
-  const [dueDateTime, setDueDateTime] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    className: "",
+    startDateTime: "",
+    dueDateTime: "",
+    totalMarks: 0,
+    duration: 0,
+  });
   const [questions, setQuestions] = useState([
-    { id: 1, text: "", type: "short", options: [""], required: false, correctAnswer: null },
+    {
+      id: 1,
+      text: "",
+      type: "short",
+      options: [""],
+      required: false,
+      correctAnswer: null,
+      marks: 2,
+    },
   ]);
 
   const handleQuestionChange = (id, key, value) => {
     setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, [key]: value } : q))
+      questions.map((q) => (q.id === id ? { ...q, [key]: value } : q)),
     );
   };
 
   const addOption = (id) => {
     setQuestions(
       questions.map((q) =>
-        q.id === id ? { ...q, options: [...q.options, ""] } : q
-      )
+        q.id === id ? { ...q, options: [...q.options, ""] } : q,
+      ),
     );
   };
 
@@ -32,7 +46,7 @@ export default function CreateAssessmentModal({ onSave }) {
           return { ...q, options: newOptions };
         }
         return q;
-      })
+      }),
     );
   };
 
@@ -56,38 +70,209 @@ export default function CreateAssessmentModal({ onSave }) {
     }
   };
 
-  const handleSave = () => {
-    const newAssessment = { title, className, startDateTime, dueDateTime, questions };
-    onSave(newAssessment);
+  const [response, setResponse] = useState({
+    success: null,
+    error: null,
+    loading: false,
+  });
 
-    // Reset form
-    setTitle("");
-    setClassName("");
-    setStartDateTime("");
-    setDueDateTime("");
-    setQuestions([{ id: 1, text: "", type: "short", options: [""], required: false, correctAnswer: null }]);
+  const handleSave = () => {
+
+    setResponse({ ...response, loading: true });
+
+    const newAssessment = {
+      title: formData.title,
+      class: formData.className,
+      startDateTime: formData.startDateTime,
+      endDateTime: formData.dueDateTime,
+      duration: formData.duration,
+      totalMarks: questions.reduce(
+        (total, q) => total + Number(q.marks || 0),
+        0,
+      ),
+      questions,
+    };
+
+    if(!formData.title.trim()||!formData.className.trim()||!formData.startDateTime||!formData.dueDateTime){
+      setResponse({
+        ...response,
+        loading: false,
+        error: "Please fill in all required fields.",
+      });
+
+      setErrors({
+        title: !formData.title.trim() ? "Title is required" : "",
+        className: !formData.className.trim() ? "Class is required" : "",
+        startDateTime: !formData.startDateTime ? "Start date is required" : "",
+        dueDateTime: !formData.dueDateTime ? "Due date is required" : "",
+        duration: !formData.duration ? "Duration is required" : "",
+        question: questions.length === 0 ? "At least one question is required" : "",
+      });
+      return;
+    }
+    try {
+      onSave(newAssessment);
+
+      setResponse({
+        ...response,
+        loading: false,
+        success: `Assessment "${formData.title}" created successfully!`,
+      });
+
+      setTimeout(() => {
+        setResponse({ ...response, success: null });
+      }, 3000);
+
+      // Reset form
+      setFormData({
+        title: "",
+        className: "",
+        startDateTime: "",
+        dueDateTime: "",
+      });
+      setQuestions([
+        {
+          id: 1,
+          text: "",
+          type: "short",
+          options: [""],
+          required: false,
+          correctAnswer: null,
+        },
+      ]);
+    } catch (error) {
+      setResponse({
+        ...response,
+        loading: false,
+        error: `Failed to create assessment "${formData.title}".`,
+      });
+
+      setTimeout(() => {
+        setResponse({ ...response, error: null });
+      }, 3000);
+    }
   };
+
+  const { getClasses } = useAuth();
+  const [classes, setClasses] = useState([]);
+
+  const handleGetClasses = async () => {
+    // Replace with actual API call to fetch classes
+    try {
+      const classes = await getClasses();
+      setClasses(classes);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+    }
+  };
+
+  const [errors, setErrors] = useState({});
+  const validate = (name, value) => {
+    let validated = true;
+    let error = "";
+
+    if (!value.trim()) {
+      error = "This field is required";
+      validated = false;
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+
+    return validated;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+    validate(name, value); // 🔥 live validation
+  };
+
+  const [questionErrors, setQuestionErrors] = useState({});
+
+  const validateQuestions = () => {
+    let valid = true;
+    questions.forEach((q) => {
+      if (!q.text.trim()) {
+        valid = false;
+      }
+    });
+    setQuestionErrors(
+      questions.reduce((acc, q) => {
+        acc[q.id] = !q.text.trim() ? "Question text is required" : "";
+        return acc;
+      }, {}),
+    );
+    return valid;
+  };
+
+  React.useEffect(() => {
+    handleGetClasses();
+    validateQuestions();
+  }, []);
+
+  const getToday = () => {
+  const today = new Date();
+  const offset = today.getTimezoneOffset();
+  const localToday = new Date(today.getTime() - offset * 60 * 1000);
+  return localToday.toISOString().split("T")[0];
+};
+
+
+  const today = getToday();
+
+  
 
   return (
     <div className="bg-black/50 flex items-center justify-center z-50">
       <div className="bg-card dark:bg-darkCard rounded-2xl w-full p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-        <h2 className="text-2xl font-bold text-textPrimary dark:text-darkTextPrimary mb-4">
-          Create New Assessment
-        </h2>
+        <div className=" flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-textPrimary dark:text-darkTextPrimary mb-4">
+            Create New Assessment
+          </h2>
+          <p className="text-sm text-textSecondary dark:text-darkTextSecondary mb-6">
+            Marks:{" "}
+            {questions.reduce((total, q) => total + Number(q.marks || 0), 0)}
+          </p>
+        </div>
+
+        {response.success && (
+          <div className="mb-4 text-green-600 font-semibold text-sm bg-green-100 p-2 rounded">
+            {response.success}
+          </div>
+        )}
+        {response.error && (
+          <div className="mb-4 text-red-600 font-semibold text-sm bg-red-100 p-2 rounded">
+            {response.error}
+          </div>
+        )}
 
         {/* ===== Settings Section ===== */}
         <div className="mb-6 border-b border-border dark:border-darkBorder pb-4">
+          {errors.general && (
+            <div className="mb-4 text-red-600 font-semibold">
+              {errors.general}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Title */}
-            <div>
+            <div className="col-span-1 md:col-span-2">
               <label className="block text-textSecondary dark:text-darkTextSecondary mb-1">
                 Title
               </label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-2 border border-border dark:border-darkBorder rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary"
+                value={formData.title}
+                name="title"
+                onBlur={handleChange}
+                onChange={handleChange}
+                className={`w-full p-2 border  rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary ${errors.title ? "border-red-500" : "border-border dark:border-darkBorder"}`}
                 placeholder="Assessment Title"
               />
             </div>
@@ -98,15 +283,34 @@ export default function CreateAssessmentModal({ onSave }) {
                 Class
               </label>
               <select
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-                className="w-full p-2 border border-border dark:border-darkBorder rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary"
+                value={formData.className}
+                name="className"
+                onBlur={handleChange}
+                onChange={handleChange}
+                className={`w-full p-2 border rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary ${errors.className ? "border-red-500" : "border-border dark:border-darkBorder"}`}
               >
                 <option value="">Select class</option>
-                <option value="Grade 9">Grade 9</option>
-                <option value="Grade 10">Grade 10</option>
-                <option value="Grade 11">Grade 11</option>
+                {classes?.map((cls) => (
+                  <option key={cls._id} value={cls._id}>
+                    {cls.name}
+                  </option>
+                ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-textSecondary dark:text-darkTextSecondary mb-1">
+                Duration (minutes)
+              </label>
+              <input
+                type="number"
+                value={formData.duration}
+                name="duration"
+                onBlur={handleChange}
+                onChange={handleChange}
+                className={`w-full p-2 border ${errors.duration ? "border-red-500" : "border-border dark:border-darkBorder"} rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary`}
+                placeholder="Duration in minutes"
+              />
             </div>
 
             {/* Start Date & Time */}
@@ -115,10 +319,13 @@ export default function CreateAssessmentModal({ onSave }) {
                 Start Date & Time
               </label>
               <input
-                type="datetime-local"
-                value={startDateTime}
-                onChange={(e) => setStartDateTime(e.target.value)}
-                className="w-full p-2 border border-border dark:border-darkBorder rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary"
+                type="date"
+                value={formData.startDateTime}
+                min={new Date().toISOString().split("T")[0]}
+                name="startDateTime"
+                onBlur={handleChange}
+                onChange={handleChange}
+                className={`w-full p-2 border ${errors.startDateTime ? "border-red-500" : "border-border dark:border-darkBorder"} rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary`}
               />
             </div>
 
@@ -128,17 +335,20 @@ export default function CreateAssessmentModal({ onSave }) {
                 Due Date & Time
               </label>
               <input
-                type="datetime-local"
-                value={dueDateTime}
-                onChange={(e) => setDueDateTime(e.target.value)}
-                className="w-full p-2 border border-border dark:border-darkBorder rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary"
+                type="date"
+                value={formData.dueDateTime}
+                name="dueDateTime"
+                min={today}
+                onBlur={handleChange}
+                onChange={handleChange}
+                className={`w-full p-2 border ${errors.dueDateTime ? "border-red-500" : "border-border dark:border-darkBorder"} rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary`}
               />
             </div>
           </div>
         </div>
 
         {/* ===== Questions Section ===== */}
-        <div>
+        <div className={`mb-6 ${errors.question ? "border-red-500" : "border-border dark:border-darkBorder"} border rounded-lg p-4`}>
           <h3 className="text-lg font-semibold text-textPrimary dark:text-darkTextPrimary mb-3">
             Questions
           </h3>
@@ -147,17 +357,6 @@ export default function CreateAssessmentModal({ onSave }) {
               key={q.id}
               className="mb-4 border border-border dark:border-darkBorder p-3 rounded-xl bg-background dark:bg-darkBackground relative"
             >
-              {/* Remove Question Button */}
-              {questions.length > 1 && (
-                <button
-                  onClick={() => removeQuestion(q.id)}
-                  className="absolute top-2 right-2 text-red-600 hover:text-red-700 font-bold"
-                  title="Remove Question"
-                >
-                  ×
-                </button>
-              )}
-
               {/* Question Text */}
               <div className="mb-2">
                 <input
@@ -198,6 +397,27 @@ export default function CreateAssessmentModal({ onSave }) {
                   />
                   Required
                 </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={q.marks}
+                  onChange={(e) =>
+                    handleQuestionChange(q.id, "marks", e.target.value)
+                  }
+                  placeholder="Marks"
+                  className="w-20 p-1 border border-border dark:border-darkBorder rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary ml-auto"
+                />
+
+                {/* Remove Question Button */}
+                {questions.length > 1 && (
+                  <button
+                    onClick={() => removeQuestion(q.id)}
+                    className="text-textSecondary dark:text-darkTextSecondary cursor-pointer hover:text-primary dark:hover:text-darkPrimary transition p-2"
+                    title="Remove Question"
+                  >
+                    <Trash2 size={18}/>
+                  </button>
+                )}
               </div>
 
               {/* Options for MCQ/Dropdown */}

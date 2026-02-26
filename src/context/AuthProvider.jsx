@@ -86,6 +86,41 @@ export function AuthProvider({ children }) {
     }
   };
 
+  //Assesment related functions can be added here (e.g., createAssessment, getAssessments, etc.)
+
+  const createAssessment = async (assessmentData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `${API_URL}/assessments`,
+        assessmentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
+  };
+
+  const getAllAssessments = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/assessments`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
+  };
+
+  // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -93,7 +128,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, getClasses, createClass, deleteClass }}
+      value={{ user, login, logout, getClasses, createClass, deleteClass, createAssessment, getAllAssessments }}
     >
       {children}
     </AuthContext.Provider>

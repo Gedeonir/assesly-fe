@@ -13,6 +13,7 @@ function Login() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = (name, value) => {
     let validated=true;
@@ -107,7 +108,7 @@ function Login() {
               </p>
             )}
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               name="password"
               value={form.password}
@@ -118,6 +119,18 @@ function Login() {
             {errors.password && (
               <p style={{ color: "red" }}>{errors.password}</p>
             )}
+
+            <div>
+              <label className="flex items-center gap-2 text-sm text-textSecondary dark:text-darkTextSecondary">
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={() => setShowPassword((prev) => !prev)}
+                />
+                Show Password
+              </label>
+            </div>
+
           </div>
 
           {/* Forgot password */}
