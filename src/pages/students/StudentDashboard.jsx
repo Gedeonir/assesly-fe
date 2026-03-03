@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/UseAuth";
 
 export default function StudentDashboard() {
   const stats = [
@@ -10,6 +11,35 @@ export default function StudentDashboard() {
   ];
 
   const navLinkStyle = "px-4 py-2 rounded-lg text-sm font-medium transition";
+
+  const { getAllAssessments } = useAuth();
+  const [assessments, setAssessments] = useState([]);
+  const [res, setResponse] = useState({
+    loading: false,
+    error: null,
+    success: null,
+  });
+
+  React.useEffect(() => {
+    const fetchAssessments = async () => {
+      setResponse({ ...res, loading: true });
+      const response = await getAllAssessments();
+      console.log(
+        response
+      );
+      
+      if (!response.error) {
+        setAssessments(response);
+        setResponse({ ...res, loading: false });
+      } else {
+        setResponse({ ...res, loading: false, error: res.error });
+      }
+    };
+    fetchAssessments();
+  }, [getAllAssessments]);
+
+  console.log(assessments);
+  
 
   const upcomingAssessments = [
     { id: 1, title: "Algebra Test", due: "Feb 20, 2026", subject: "Math" },

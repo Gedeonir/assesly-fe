@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }) {
 
 
   return (
-    <div className="min-h-screen flex bg-background dark:bg-darkBackground">
+    <div className="min-h-screen flex bg-gradient-to-br from-rose-100 to-purple-200 dark:bg-darkBackground">
 
       {/* ===== Sidebar ===== */}
       <div

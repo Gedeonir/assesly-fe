@@ -2,53 +2,51 @@ import React, { useState } from "react";
 import DashboardLayout from "./DashboardLayout";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { useAuth } from "../../context/UseAuth";
 
 export default function AssessmentView() {
   const [activeTab, setActiveTab] = useState("questions");
-  // Mock data (replace with real API later)
-  const assessment = {
-    title: "Math Quiz 1",
-    className: "Grade 10",
-    startDateTime: "2026-02-11T08:00",
-    dueDateTime: "2026-02-12T12:00",
-    questions: [
-      {
-        id: 1,
-        text: "What is 2 + 2?",
-        type: "mcq",
-        options: ["3", "4", "5"],
-        correctAnswer: 1,
-        marks: 5,
-        required: true,
-      },
-      {
-        id: 2,
-        text: "Explain Pythagoras theorem.",
-        type: "short",
-        marks: 10,
-        required: false,
-      },
-    ],
-    responses: [
-      {
-        id: 1,
-        student: "John Doe",
-        score: 12,
-        submittedAt: "2026-02-11 09:30",
-      },
-      {
-        id: 2,
-        student: "Jane Smith",
-        score: 15,
-        submittedAt: "2026-02-11 10:10",
-      },
-    ],
-  };
+  // // Mock data (replace with real API later)
+  // const assessment = {
+  //   title: "Math Quiz 1",
+  //   className: "Grade 10",
+  //   startDateTime: "2026-02-11T08:00",
+  //   dueDateTime: "2026-02-12T12:00",
+  //   questions: [
+  //     {
+  //       id: 1,
+  //       text: "What is 2 + 2?",
+  //       type: "mcq",
+  //       options: ["3", "4", "5"],
+  //       correctAnswer: 1,
+  //       marks: 5,
+  //       required: true,
+  //     },
+  //     {
+  //       id: 2,
+  //       text: "Explain Pythagoras theorem.",
+  //       type: "short",
+  //       marks: 10,
+  //       required: false,
+  //     },
+  //   ],
+  //   responses: [
+  //     {
+  //       id: 1,
+  //       student: "John Doe",
+  //       score: 12,
+  //       submittedAt: "2026-02-11 09:30",
+  //     },
+  //     {
+  //       id: 2,
+  //       student: "Jane Smith",
+  //       score: 15,
+  //       submittedAt: "2026-02-11 10:10",
+  //     },
+  //   ],
+  // };
 
-  const totalMarks = assessment.questions.reduce(
-    (acc, q) => acc + (q.marks || 0),
-    0,
-  );
+  const totalMarks = 0
 
   const exportToExcel = () => {
     // Prepare data
@@ -79,6 +77,47 @@ export default function AssessmentView() {
     saveAs(blob, `${assessment.title}_Results.xlsx`);
   };
 
+  const { getOneAssessment } = useAuth();
+  const [fetchingRes, setFetchingRes] = useState({
+    loading: false,
+    error: null,
+    success: null,
+  });
+
+  const [assessment, setAssessment] = useState([]);
+
+  const fetchAssessment = async () => {
+    setFetchingRes({ ...fetchingRes, loading: true });
+    const assessmentId = window.location.pathname.split("/").pop();
+    const response = await getOneAssessment(assessmentId);
+    if (!response.error) {
+      setAssessment({ ...response, className: response.class._id });
+      setFetchingRes({
+        ...fetchingRes,
+        loading: false,
+        success: "Assessment data fetched successfully!",
+      });
+    } else {
+      setFetchingRes({
+        ...fetchingRes,
+        loading: false,
+        error: response.error.data.message || "Failed to fetch assessment",
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAssessment();
+  }, []);
+
+
+  const handleRefetch = () => {
+    setFetchingRes({ ...fetchingRes, error: null, success: null });
+    fetchAssessment();
+  };
+
+  console.log(assessment)
+
   return (
     <DashboardLayout>
       <div className="p-px">
@@ -88,7 +127,7 @@ export default function AssessmentView() {
             {assessment.title}
           </h1>
           <p className="text-textSecondary dark:text-darkTextSecondary">
-            {assessment.className} • Start: {assessment.startDateTime} • Due:{" "}
+            {assessment.class?.name} • Start: {assessment.startDateTime} • Due:{" "}
             {assessment.dueDateTime}
           </p>
           <p className="mt-2 font-semibold">Total Marks: {totalMarks}</p>
@@ -122,9 +161,9 @@ export default function AssessmentView() {
         {/* Tab Content */}
         {activeTab === "questions" && (
           <div className="space-y-4">
-            {assessment.questions.map((q, index) => (
+            {assessment?.questions?.map((q, index) => (
               <div
-                key={q.id}
+                key={q._id}
                 className="p-4 rounded-xl border border-border dark:border-darkBorder bg-card dark:bg-darkCard"
               >
                 <h3 className="font-semibold mb-2">

@@ -7,6 +7,10 @@ module.exports =  {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ["Playfair Display", "serif"],
+        sans: ["Inter", "sans-serif"],
+      },
       colors: {
         // Light theme colors
         primary: '#2563EB',        // Deep Blue

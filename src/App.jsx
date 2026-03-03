@@ -6,9 +6,11 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import TeacherAssessments from "./pages/Teacher/TAssesments";
 import CreateAssessment from "./pages/Teacher/CreateAssesment";
+import AssesmentEdit from "./pages/Teacher/AssesmentEdit";
 import AssessmentView from "./pages/Teacher/AssesmentView";
 import Profile from "./pages/Teacher/TProfile";
 import Classes from "./pages/Teacher/TClasses";
+
 import StudentLayout from "./pages/students/StudentLayout";
 import TakeAssessment from "./pages/students/TakeAssessment";
 import StudentResults from "./pages/students/StudentsResults";
@@ -16,6 +18,7 @@ import StudentResultsHistory from "./pages/students/StudentResultHistory";
 import StudentProfile from "./pages/students/StudentProfile";
 import StudentAssessments from "./pages/students/StudentAssesments";
 import StudentClasses from "./pages/students/StudentClasses";
+import Tstudents from "./pages/Teacher/Tstudents";
 
 function App() {
   return (
@@ -51,7 +54,16 @@ function App() {
       />
 
       <Route
-        path="/teacher/dashboard/assessments/view"
+        path="/teacher/dashboard/assessments/edit/:id"
+        element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <AssesmentEdit />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/teacher/dashboard/assessments/view/:id"
         element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <AssessmentView />
@@ -73,6 +85,15 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["teacher"]}>
             <Classes />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+      path="/teacher/dashboard/students"
+              element={
+          <ProtectedRoute allowedRoles={["teacher"]}>
+            <Tstudents/>
           </ProtectedRoute>
         }
       />

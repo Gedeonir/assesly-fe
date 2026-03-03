@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { AuthContext } from "./AuthContext";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+import api from "../utils/api";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(
@@ -11,7 +9,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/auth/login`, {
+      const res = await api.post(`/auth/login`, {
         email,
         password,
       });
@@ -20,11 +18,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem("token", res?.data?.token);
 
       // Fetch user profile
-      const profileRes = await axios.get(`${API_URL}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${res?.data?.token}`,
-        },
-      });
+      const profileRes = await api.get(`/auth/profile`);
 
       // Save full user info
       setUser(profileRes.data);
@@ -36,14 +30,16 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const logout=()=>{
+    setUser(null);
+    localStorage.removeItem("token");
+  }
+  
+
   const getClasses = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/classes`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const res = await api.get(`/classes`);
       return res.data;
     } catch (error) {
       return { error: error.response };
@@ -52,16 +48,11 @@ export function AuthProvider({ children }) {
 
   const createClass = async (className) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${API_URL}/classes`,
+
+      const res = await api.post(
+        `/classes`,
         {
-          name:className,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          name: className,
         },
       );
       return res.data;
@@ -72,16 +63,12 @@ export function AuthProvider({ children }) {
 
   const deleteClass = async (classId) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.delete(`${API_URL}/classes/${classId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const res = await api.delete(`/classes/${classId}`);
       return res.data;
     } catch (error) {
       console.log(error);
-      
+
       return { error: error.response };
     }
   };
@@ -90,16 +77,8 @@ export function AuthProvider({ children }) {
 
   const createAssessment = async (assessmentData) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${API_URL}/assessments`,
-        assessmentData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+
+      const res = await api.post(`/assessments`, assessmentData);
       return res.data;
     } catch (error) {
       return { error: error.response };
@@ -108,27 +87,69 @@ export function AuthProvider({ children }) {
 
   const getAllAssessments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/assessments`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const res = await api.get(`/assessments`);
       return res.data;
     } catch (error) {
       return { error: error.response };
     }
   };
 
-  // Logout function
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  const deleteAssessment = async (assessmentId) => {
+    try {
+
+      const res = await api.delete(`/assessments/${assessmentId}`);
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
   };
+
+  const getOneAssessment = async (assessmentId) => {
+    try {
+      const res = await api.get(`/assessments/${assessmentId}`);
+      return res.data;
+    } catch (error) {
+      return { error: error.response };
+    }
+  };
+
+
+  const getStudents=async ()=>{
+    try {
+      const res=await api.get('/teachers/students');
+      return res.data;
+    } catch (error) {
+      return {error:error.response};
+    }
+  }
+
+  const assignStudentToClass=async(studentId,classId)=>{
+    try {
+      const res=await api.patch(`/teachers/students/${studentId}`,{className:classId});
+      return res.data
+    } catch (error) {
+      return {error:error.response};
+    }
+  }
+
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, getClasses, createClass, deleteClass, createAssessment, getAllAssessments }}
+      value={{
+        user,
+        login,
+        logout,
+        getClasses,
+        createClass,
+        deleteClass,
+        createAssessment,
+        getAllAssessments,
+        deleteAssessment,
+        getOneAssessment,
+        getStudents,
+        assignStudentToClass,
+      }}
     >
       {children}
     </AuthContext.Provider>

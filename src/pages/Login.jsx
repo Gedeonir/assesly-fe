@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../utils/ThemeToggle";
 import { useState } from "react";
 import logo from "../assets/AsseslyLogo.png";
+import { LoaderCircle } from 'lucide-react';
 
 function Login() {
   const { login } = useAuth();
@@ -148,7 +149,7 @@ function Login() {
               w-full mt-4 py-3 bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkPrimaryHover text-white rounded-lg shadow-md transition`}
           disabled={errors.email || errors.password || loading}
           >
-            Login
+              {loading ? <LoaderCircle size={24} className="animate-spin w-full"/> : "Login"}
           </button>
 
           {/* Or divider */}

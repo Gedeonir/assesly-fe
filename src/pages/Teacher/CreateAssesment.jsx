@@ -17,6 +17,7 @@ const CreateAssessment = () => {
     <DashboardLayout>
       <CreateAssessmentModal
         onSave={handleCreateAssessment}
+        action="create"
       />
     </DashboardLayout>
   );

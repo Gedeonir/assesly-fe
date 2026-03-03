@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/UseAuth";
-import { Trash2 } from "lucide-react";
+import { LoaderCircle, Trash2 } from "lucide-react";
+import FetchingModal from "./FetchingModal";
 
-export default function CreateAssessmentModal({ onSave }) {
+export default function CreateAssessmentModal({ onSave, action }) {
   const [formData, setFormData] = useState({
     title: "",
     className: "",
@@ -77,7 +78,6 @@ export default function CreateAssessmentModal({ onSave }) {
   });
 
   const handleSave = () => {
-
     setResponse({ ...response, loading: true });
 
     const newAssessment = {
@@ -93,7 +93,12 @@ export default function CreateAssessmentModal({ onSave }) {
       questions,
     };
 
-    if(!formData.title.trim()||!formData.className.trim()||!formData.startDateTime||!formData.dueDateTime){
+    if (
+      !formData.title.trim() ||
+      !formData.className.trim() ||
+      !formData.startDateTime ||
+      !formData.dueDateTime
+    ) {
       setResponse({
         ...response,
         loading: false,
@@ -104,20 +109,29 @@ export default function CreateAssessmentModal({ onSave }) {
         title: !formData.title.trim() ? "Title is required" : "",
         className: !formData.className.trim() ? "Class is required" : "",
         startDateTime: !formData.startDateTime ? "Start date is required" : "",
-        dueDateTime: !formData.dueDateTime ? "Due date is required" : "",
+        endDateTime: !formData.dueDateTime ? "Due date is required" : "",
         duration: !formData.duration ? "Duration is required" : "",
-        question: questions.length === 0 ? "At least one question is required" : "",
+        question:
+          questions.length === 0 ? "At least one question is required" : "",
       });
       return;
     }
     try {
       onSave(newAssessment);
 
-      setResponse({
-        ...response,
-        loading: false,
-        success: `Assessment "${formData.title}" created successfully!`,
-      });
+      if (action === "create") {
+        setResponse({
+          ...response,
+          loading: false,
+          success: `Assessment "${formData.title}" created successfully!`,
+        });
+      }else{
+        setResponse({
+          ...response,
+          loading: false,
+          success: `Assessment updated successfully!`,
+        });
+      }
 
       setTimeout(() => {
         setResponse({ ...response, success: null });
@@ -216,24 +230,73 @@ export default function CreateAssessmentModal({ onSave }) {
     validateQuestions();
   }, []);
 
-  const getToday = () => {
-  const today = new Date();
-  const offset = today.getTimezoneOffset();
-  const localToday = new Date(today.getTime() - offset * 60 * 1000);
-  return localToday.toISOString().split("T")[0];
-};
+  const { getOneAssessment } = useAuth();
+  const [fetchingRes, setFetchingRes] = useState({
+    loading: false,
+    error: null,
+    success: null,
+  });
 
+  const fetchAssessment = async () => {
+    if (action === "edit") {
+      setFetchingRes({ ...fetchingRes, loading: true });
+      const assessmentId = window.location.pathname.split("/").pop();
+      const response = await getOneAssessment(assessmentId);
+      if (!response.error) {
+        setFormData({ ...response, className: response.class._id });
+        setQuestions(response.questions);
+        setFetchingRes({
+          ...fetchingRes,
+          loading: false,
+          success: "Assessment data fetched successfully!",
+        });
+      } else {
+        setFetchingRes({
+          ...fetchingRes,
+          loading: false,
+          error: response.error.data.message || "Failed to fetch assessment",
+        });
+      }
+    } else {
+      console.log("not edit");
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAssessment();
+  }, [action]);
+
+  const formatForDateInput = (isoString) => {
+    if (!isoString) return "";
+    return isoString.split("T")[0];
+  };
+
+  const handleRefetch = () => {
+    setFetchingRes({ ...fetchingRes, error: null, success: null });
+    fetchAssessment();
+  };
+
+  const getToday = (date) => {
+    const today = date ? new Date(date) : new Date();
+    const offset = today.getTimezoneOffset();
+    const localToday = new Date(today.getTime() - offset * 60 * 1000);
+    return localToday.toISOString().split("T")[0];
+  };
 
   const today = getToday();
 
-  
-
   return (
     <div className="bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card dark:bg-darkCard rounded-2xl w-full p-6 shadow-lg overflow-y-auto max-h-[90vh]">
+      <div className="bg-card relative dark:bg-darkCard rounded-2xl w-full p-6 shadow-lg overflow-y-auto max-h-[90vh]">
+        {/* Fetching overlay */}
+        {fetchingRes.loading && <FetchingModal status="fetching" />}
+        {fetchingRes.error && (
+          <FetchingModal status="error" handleRefetch={handleRefetch} />
+        )}
+
         <div className=" flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-textPrimary dark:text-darkTextPrimary mb-4">
-            Create New Assessment
+            {action == "edit" ? "Edit assessment" : "Create New Assessment"}
           </h2>
           <p className="text-sm text-textSecondary dark:text-darkTextSecondary mb-6">
             Marks:{" "}
@@ -268,7 +331,7 @@ export default function CreateAssessmentModal({ onSave }) {
               </label>
               <input
                 type="text"
-                value={formData.title}
+                value={formData.title ?? ""}
                 name="title"
                 onBlur={handleChange}
                 onChange={handleChange}
@@ -283,7 +346,7 @@ export default function CreateAssessmentModal({ onSave }) {
                 Class
               </label>
               <select
-                value={formData.className}
+                value={formData.className ?? ""}
                 name="className"
                 onBlur={handleChange}
                 onChange={handleChange}
@@ -304,7 +367,7 @@ export default function CreateAssessmentModal({ onSave }) {
               </label>
               <input
                 type="number"
-                value={formData.duration}
+                value={formData.duration ?? ""}
                 name="duration"
                 onBlur={handleChange}
                 onChange={handleChange}
@@ -316,11 +379,11 @@ export default function CreateAssessmentModal({ onSave }) {
             {/* Start Date & Time */}
             <div>
               <label className="block text-textSecondary dark:text-darkTextSecondary mb-1">
-                Start Date & Time
+                Start on
               </label>
               <input
                 type="date"
-                value={formData.startDateTime}
+                value={formatForDateInput(formData.startDateTime ?? "")}
                 min={new Date().toISOString().split("T")[0]}
                 name="startDateTime"
                 onBlur={handleChange}
@@ -332,15 +395,16 @@ export default function CreateAssessmentModal({ onSave }) {
             {/* Due Date & Time */}
             <div>
               <label className="block text-textSecondary dark:text-darkTextSecondary mb-1">
-                Due Date & Time
+                Due on
               </label>
               <input
                 type="date"
-                value={formData.dueDateTime}
+                value={formatForDateInput(formData.dueDateTime ?? "")}
                 name="dueDateTime"
-                min={today}
+                min={getToday(formData.startDateTime)}
                 onBlur={handleChange}
                 onChange={handleChange}
+                disabled={!formData.startDateTime}
                 className={`w-full p-2 border ${errors.dueDateTime ? "border-red-500" : "border-border dark:border-darkBorder"} rounded-lg bg-background dark:bg-darkBackground text-textPrimary dark:text-darkTextPrimary`}
               />
             </div>
@@ -348,13 +412,15 @@ export default function CreateAssessmentModal({ onSave }) {
         </div>
 
         {/* ===== Questions Section ===== */}
-        <div className={`mb-6 ${errors.question ? "border-red-500" : "border-border dark:border-darkBorder"} border rounded-lg p-4`}>
+        <div
+          className={`mb-6 ${errors.question ? "border-red-500" : "border-border dark:border-darkBorder"} border rounded-lg p-4`}
+        >
           <h3 className="text-lg font-semibold text-textPrimary dark:text-darkTextPrimary mb-3">
             Questions
           </h3>
           {questions.map((q, index) => (
             <div
-              key={q.id}
+              key={q._id}
               className="mb-4 border border-border dark:border-darkBorder p-3 rounded-xl bg-background dark:bg-darkBackground relative"
             >
               {/* Question Text */}
@@ -415,7 +481,7 @@ export default function CreateAssessmentModal({ onSave }) {
                     className="text-textSecondary dark:text-darkTextSecondary cursor-pointer hover:text-primary dark:hover:text-darkPrimary transition p-2"
                     title="Remove Question"
                   >
-                    <Trash2 size={18}/>
+                    <Trash2 size={18} />
                   </button>
                 )}
               </div>

@@ -322,7 +322,7 @@ export default function TakeAssessment() {
               <br />
               Violations: {violations}
             </p>
-
+ 
             <p className="text-sm text-textSecondary">
               You must remain in fullscreen during the assessment.
             </p>

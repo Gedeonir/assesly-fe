@@ -12,7 +12,7 @@ export default function Sidebar({
   const teacherLinks = [
     { name: "Dashboard", href: "/teacher/dashboard/" },
     { name: "Classes", href: "/teacher/dashboard/classes" },
-    { name: "Students", href: "#" },
+    { name: "Students", href: "/teacher/dashboard/students" },
     { name: "Assessments", href: "/teacher/dashboard/assessments" },
     { name: "Profile", href: "/teacher/dashboard/profile" },
   ];
@@ -40,7 +40,7 @@ export default function Sidebar({
       <div className="space-y-12 w-full">
         <div className="flex items-center justify-between px-4 py-4">
           {collapsed && (
-            <h2 className="text-lg font-bold text-primary">Teacher Panel</h2>
+            <h2 className="text-lg font-bold text-primary">Menu</h2>
           )}
 
           <button
